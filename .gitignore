@@ -30,6 +30,7 @@ bower_components
 .lock-wscript
 
 # Compiled binary addons (https://nodejs.org/api/addons.html)
+**/dist
 build/Release
 
 # Dependency directories
@@ -42,7 +43,8 @@ typings/
 # Optional npm cache directory
 .npm
 
-# Optional eslint cache
+# Optional eslint config & cache
+.eslintrc.json
 .eslintcache
 
 # Optional REPL history
@@ -59,3 +61,4 @@ typings/
 
 # next.js build output
 .next
+
