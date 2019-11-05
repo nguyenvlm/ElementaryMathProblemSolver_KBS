@@ -1,4 +1,7 @@
+# coding=utf-8
+
 import json
+
 
 def read_json(path):
     json_value = None

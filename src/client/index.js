@@ -14,7 +14,9 @@ var card_template = `<div class="card">
 
   <div id="{{ id }}" class="collapse" data-parent="#messages-view">
     <div class="card-body">
-      {{ answer }}
+      <code>
+{{ answer }}
+      </code>
     </div>
   </div>
 </div>`;
@@ -29,7 +31,7 @@ socket.on("answer", msg => {
   var card = card_template
     .replace(/{{ id }}/g, msg.id)
     .replace(/{{ question }}/g, msg.question)
-    .replace(/{{ answer }}/g, msg.answer.replace("\n", "<br />"));
+    .replace(/{{ answer }}/g, msg.answer.replace(/\n/g, "<br />").trim());
 
   box.append(card);
 });

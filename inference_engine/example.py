@@ -1,3 +1,6 @@
+# coding=utf-8
+
+
 def ex(s):
     # s = 'Trên bàn có 7 đĩa cam, mỗi đĩa có 8 quả. Hỏi trên bàn có bao nhiêu quả cam?'
     s = s.lower()
@@ -44,5 +47,6 @@ def ex(s):
         q.append(k)
         for i in q:
             print(i)
+
 
 ex('TRÊN bàn có 8 chồng sách, mỗi chồng sách có 2 quyển sách. Hỏi trên bàn có mấy quyển sách?')

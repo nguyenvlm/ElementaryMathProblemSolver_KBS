@@ -87,6 +87,11 @@ body {
           text-decoration: underline;
         }
       }
+
+      .card-body code {
+        color: $text-color;
+        margin: 0;
+      }
     }
   }
 }

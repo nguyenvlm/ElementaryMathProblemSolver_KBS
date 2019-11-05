@@ -1,4 +1,4 @@
-const bot = require("./src/chatbot")();
+const bot = require("./lib/spawn_bot")();
 
 const express = require("express");
 const http = require("http");
