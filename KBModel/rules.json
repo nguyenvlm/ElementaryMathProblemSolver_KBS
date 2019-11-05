@@ -1,0 +1,9 @@
+{
+    "own_single(A;B;a)&own_single(B;C;b)": [
+        "Số $C $A có là:\n\t$a x $b = [*($a,$b)] ($C)\n",
+        "own_single(A;C;*(a,b))"
+    ],
+    "own_single(A;B;a)&own_single(A;B;_)": [
+        "Đáp số: $a"
+    ]
+}
