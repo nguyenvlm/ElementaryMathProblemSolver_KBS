@@ -1,0 +1,12 @@
+{
+    "own_single": {
+        "var": ["A", "B", "x"],
+        "filter": ["mỗi", "một", "Mỗi", "Một", "Biết", "biết"],
+        "split": [ "có", "cho"]
+    },
+    "own_multi": {
+        "var": ["A", "B", "x", "y"],
+        "filter": {},
+        "split": ["có", "cho"]
+    }
+}
