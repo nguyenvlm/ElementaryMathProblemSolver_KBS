@@ -5,21 +5,8 @@ import io from "socket.io-client";
 
 var socket = io();
 
-var card_template = `<div class="card">
-  <div class="card-header p-0">
-    <a data-toggle="collapse" data-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">
-      {{ question }}
-    </a>
-  </div>
-
-  <div id="{{ id }}" class="collapse" data-parent="#messages-view">
-    <div class="card-body">
-      <code>
-{{ answer }}
-      </code>
-    </div>
-  </div>
-</div>`;
+var card_template =
+  '<div class="card"><div class="card-header p-0"><a data-toggle="collapse" data-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">{{ question }}</a></div><div id="{{ id }}" class="collapse" data-parent="#messages-view"><div class="card-body"><pre>{{ answer }}</pre></div></div></div>';
 
 socket.on("connect", () => {
   console.log("Connected to Server");
@@ -31,7 +18,7 @@ socket.on("answer", msg => {
   var card = card_template
     .replace(/{{ id }}/g, msg.id)
     .replace(/{{ question }}/g, msg.question)
-    .replace(/{{ answer }}/g, msg.answer.replace(/\n/g, "<br />").trim());
+    .replace(/{{ answer }}/g, msg.answer);
 
   box.append(card);
 });
@@ -50,6 +37,7 @@ $("#chatbox").submit(event => {
     });
   }
   $("#message").val("");
+  $("#message").change();
 });
 
 // Autoresize message Input area
