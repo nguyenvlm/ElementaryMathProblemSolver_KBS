@@ -1,18 +1,31 @@
+const bot = require("./src/chatbot")();
+
 const express = require("express");
 const http = require("http");
 const socketIO = require("socket.io");
 const PORT = 8080;
 
 const app = express();
-const server = http(app);
+const server = http.createServer(app);
 const io = socketIO(server);
 
 app.use(express.static("public"));
+
 io.on("connection", socket => {
-  console.log(socket);
+  console.log("New Connection from", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log(socket.id, "disconnected!");
+  });
+
+  socket.on("ask", msg => {
+    bot.ask(msg.question, answer => {
+      socket.emit("answer", Object.assign({ answer: answer }, msg));
+    });
+  });
 });
 
-app.listen(PORT, "localhost", error => {
+server.listen(PORT, "localhost", error => {
   if (error) console.log(error);
   else console.log("Server is listening on Port", PORT);
 });

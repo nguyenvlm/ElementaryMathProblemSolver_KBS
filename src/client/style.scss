@@ -1,0 +1,92 @@
+$fa-font-path: '~@fortawesome/fontawesome-free/webfonts';
+@import '~@fortawesome/fontawesome-free/scss/fontawesome';
+@import '~@fortawesome/fontawesome-free/scss/solid';
+
+@import "bootstrap/scss/bootstrap";
+
+$text-color: #bcbdbf;
+$component-color: #40444b;
+$background: #202225;
+
+body {
+  height: 100vh;
+  background-color: $background;
+}
+
+#chatbox {
+  background-color: #2f3136;
+  border-radius: 7px;
+  height: auto;
+  padding: 10pt;
+
+  #outbound {
+    background-color: #36393f;
+    border-radius: 7px 7px 7px 7px;
+    overflow: hidden;
+
+    #message-box {
+      padding: 8px;
+
+      #message {
+        height: 40px;
+        overflow-y: hidden;
+        background-color: #40444b;
+        font-size: 11pt;
+        color: $text-color;
+        border: none;
+        resize: none;
+        padding: 10px;
+        border-radius: 7px 0 0 7px;
+      }
+
+      button {
+        height: 40px;
+        background-color: #40444b;
+        padding: 0 16px;
+        color: $text-color;
+        border-radius: 0 7px 7px 0;
+
+        :hover {
+          color: #ffffff;
+        }
+      }
+    }
+  }
+
+  #messages-view {
+    height: 450px;
+    width: 100%;
+    color: $text-color;
+    border-bottom: 1pt solid #42454a;
+    overflow-x: hidden;
+
+    .card {
+      border: none;
+      border-bottom: 1px solid hsla(0, 0%, 100%, 0.06);
+      background-color: transparent;
+
+      .card-header {
+        border: none;
+        background-color: transparent;
+      }
+
+      a {
+        color: rgb(52, 152, 219);
+        display: block;
+        height: 40px;
+        width: 100%;
+        padding: 6pt;
+        text-decoration: none;
+        font-weight: bold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: pointer;
+
+        &:hover {
+          text-decoration: underline;
+        }
+      }
+    }
+  }
+}
