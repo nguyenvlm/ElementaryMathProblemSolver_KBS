@@ -1,4 +1,4 @@
-import "jquery";
+import $ from "jquery";
 import "bootstrap";
 
 import io from "socket.io-client";
@@ -6,7 +6,7 @@ import io from "socket.io-client";
 var socket = io();
 
 var card_template =
-  '<div class="card"><div class="card-header p-0"><a data-toggle="collapse" data-target="#{{ id }}" aria-expanded="false" aria-controls="{{ id }}">{{ question }}</a></div><div id="{{ id }}" class="collapse" data-parent="#messages-view"><div class="card-body"><pre>{{ answer }}</pre></div></div></div>';
+  '<div class="card"><div class="card-header p-0"><a data-toggle="collapse" data-target="#{{ id }}" aria-expanded="true" aria-controls="{{ id }}"><i class="fas fa-caret-down"></i> {{ question }}</a></div><div id="{{ id }}" class="collapse show"><div class="card-body"><pre>{{ answer }}</pre></div></div></div>';
 
 socket.on("connect", () => {
   console.log("Connected to Server");
@@ -21,6 +21,25 @@ socket.on("answer", msg => {
     .replace(/{{ answer }}/g, msg.answer);
 
   box.append(card);
+  box.animate({ scrollTop: box.prop("scrollHeight") }, 1000);
+
+  $(`#${msg.id}`).on("hide.bs.collapse", () => {
+    var symbol = $(`#${msg.id}`)
+      .parent()
+      .find(".card-header a i");
+
+    symbol.removeClass("fa-caret-down");
+    symbol.addClass("fa-caret-right");
+  });
+
+  $(`#${msg.id}`).on("show.bs.collapse", () => {
+    var symbol = $(`#${msg.id}`)
+      .parent()
+      .find(".card-header a i");
+
+    symbol.removeClass("fa-caret-right");
+    symbol.addClass("fa-caret-down");
+  });
 });
 
 $("#chatbox").submit(event => {

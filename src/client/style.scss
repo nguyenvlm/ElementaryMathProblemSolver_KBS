@@ -25,7 +25,8 @@ body {
     overflow: hidden;
 
     #message-box {
-      padding: 8px;
+      margin: 15px 25px 25px;
+      width: auto;
 
       #message {
         height: 40px;
@@ -44,10 +45,15 @@ body {
         background-color: #40444b;
         padding: 0 16px;
         color: $text-color;
+        border: none;
         border-radius: 0 7px 7px 0;
 
-        :hover {
+        &:hover {
           color: #ffffff;
+        }
+
+        &:active {
+          color: rgba(185, 185, 185, 0.71);
         }
       }
     }
@@ -68,23 +74,29 @@ body {
       .card-header {
         border: none;
         background-color: transparent;
-      }
 
-      a {
-        color: rgb(52, 152, 219);
-        display: block;
-        height: 40px;
-        width: 100%;
-        padding: 6pt;
-        text-decoration: none;
-        font-weight: bold;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        cursor: pointer;
+        a {
+          color: rgb(52, 152, 219);
+          display: block;
+          height: auto;
+          width: 100%;
+          padding: 6pt;
+          text-decoration: none;
+          font-weight: bold;
+          cursor: pointer;
 
-        &:hover {
-          text-decoration: underline;
+          transition: 0.75s all ease;
+
+          &:hover {
+            text-decoration: underline;
+          }
+
+          &.collapsed {
+            height: 40px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+          }
         }
       }
 

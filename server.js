@@ -25,7 +25,7 @@ io.on("connection", socket => {
   });
 });
 
-server.listen(PORT, "localhost", error => {
+server.listen(PORT, "0.0.0.0", error => {
   if (error) console.log(error);
   else console.log("Server is listening on Port", PORT);
 });
