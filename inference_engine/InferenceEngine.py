@@ -21,7 +21,8 @@ class InferenceEngine:
             '+': lambda a: reduce(lambda x, y: x+y, a),
             '-': lambda a: reduce(lambda x, y: x-y, a),
             '*': lambda a: reduce(lambda x, y: x*y, a),
-            '/': lambda a: reduce(lambda x, y: x/y, a),
+            '//': lambda a: reduce(lambda x, y: x//y, a),
+            '/': lambda a: reduce(lambda x,y: x/y, a)
         }
         self.answer = ''
 
@@ -45,8 +46,6 @@ class InferenceEngine:
                     break
             if not found:
                 return "Không thể nhận dạng câu hỏi \"%s\"." % (clause) if isquery else "Không thể nhận dạng giả thiết \"%s\"." % (clause)
-        # print(self.facts)
-        # print(self.queries)
         self.infer()
         return self.answer
 
@@ -57,17 +56,21 @@ class InferenceEngine:
         varSep = self.relations[rela]["split"]
         varFilter = self.relations[rela]["filter"]
 
+        clause = re.sub("\\s+", " ", clause)
         clause = re.sub("(%s)" % ("|".join(varFilter)), "", clause)
 
-        numbers = re.findall("\d{1,}", clause)
-        clause = re.sub("\d{1,}", "", clause)
+        numbers = re.findall("\d+", clause)
+        clause = re.sub("\d+", "", clause)
 
         if isquery:
             clause = re.sub("(Hỏi|mấy|bao nhiêu|\?)", "", clause)
 
-        objects = [w for w in re.split(
-            "(%s)" % ("|".join(varSep)), clause) if len(w) > 0 and w not in varSep]
+        objects = [w for w in re.split("(%s)" % ("|".join(varSep)), clause) if len(w) > 0 and w not in varSep]
         varList = []
+
+        # print(objects)
+        # print(numbers)
+        
         for v in range(len(varProto)-int(isquery)):
             if varProto[v].isupper():
                 varList.append(objects.pop(0).strip().lower())
@@ -78,59 +81,71 @@ class InferenceEngine:
         return {"name": rela, "var": varList}
 
     def infer(self):
-        while len(self.facts):
+        F = self.facts
+        F.extend(self.queries)
+        R = self.rules
+        E = set() # Explored Rules
+        nquery = len(self.queries)
+        while nquery:
             match = False
-            F = self.facts
-            Q = self.queries
-            R = self.rules
             rule = None
-            if len(F) == 1:
-                F.extend(Q)
-                Q = []
+            # print("F::", F)
             for i in range(len(F)):
                 varMap = dict()
-                curobj = ord('A')
-                curnum = ord('a')
+                curobj1 = ord('A')
+                curnum1 = ord('a')
                 f1 = []
                 for v in F[i]["var"]:
                     if v is None:
                         f1.append('_')
                     elif type(v) is str:
-                        f1.append(chr(curobj))
-                        varMap[chr(curobj)] = v
-                        curobj += 1
+                        f1.append(chr(curobj1))
+                        varMap[chr(curobj1)] = v
+                        curobj1 += 1
                     else:
-                        f1.append(chr(curnum))
-                        varMap[chr(curnum)] = v
-                        curnum += 1
+                        f1.append(chr(curnum1))
+                        varMap[chr(curnum1)] = v
+                        curnum1 += 1
                 for j in range(len(F)):
-                    if j == i:
-                        continue
+                    curobj2 = curobj1
+                    curnum2 = curnum1
                     f2 = []
                     for v in F[j]["var"]:
                         if v not in F[i]["var"]:
                             if v is None:
                                 f2.append('_')
                             elif type(v) is str:
-                                f2.append(chr(curobj))
-                                varMap[chr(curobj)] = v
-                                curobj += 1
+                                f2.append(chr(curobj2))
+                                varMap[chr(curobj2)] = v
+                                curobj2 += 1
                             else:
-                                f2.append(chr(curnum))
-                                varMap[chr(curnum)] = v
-                                curnum += 1
+                                f2.append(chr(curnum2))
+                                varMap[chr(curnum2)] = v
+                                curnum2 += 1
                         else:
                             tmp = f1[F[i]["var"].index(v)]
                             f2.append(tmp)
                             varMap[tmp] = v
-                    rule = "%s(%s)&%s(%s)" % (
-                        F[i]["name"], ';'.join(f1), F[j]["name"], ';'.join(f2))
+                    rule = "%s(%s)&%s(%s)" % (F[i]["name"], ';'.join(f1), F[j]["name"], ';'.join(f2))
+
+                    # print("ExploredRule::", rule)
+                    # print("ExploredFact::",str(F[i])+ "&" + str(F[j]))
+
+                    if str(F[i])+ "&" + str(F[j]) in E:
+                        continue
+                    E.add(str(F[i])+ "&" + str(F[j]))
                     if rule in R:
                         match = True
-                        if i < j:
-                            i, j = j, i
-                        F.pop(i)
-                        F.pop(j)
+                        if None in F[i]["var"] + F[j]["var"] and F[i]["name"] == F[j]["name"]:
+                            nquery -= 1
+                        
+                        # print("Rule match::", rule)
+
+                        # Delete old facts:
+                        # if i < j:
+                        #     i, j = j, i
+                        # F.pop(i)
+                        # F.pop(j)
                         tmp = R[rule]
 
                         # Get new fact
@@ -157,14 +172,13 @@ class InferenceEngine:
                             else:
                                 desc = desc.replace('$'+v, str(varMap[v]))
 
-                        for opans in [self.opmap[o[1]](int(t) for t in o[3:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
+                        for opans in [self.opmap[o[1:o.index('(')]](int(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
                             desc = re.sub('\[.*\]', str(opans), desc)
                         self.answer += desc
                         break
-                if match:
-                    break
+                if match: break
             if not match:
-                self.answer = "Không thể tìm thấy suy luận thích hợp."
+                self.answer += "\n\nKhông thể tiếp tục quá trình suy luận!"
                 return
 
 

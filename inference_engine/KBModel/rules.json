@@ -4,6 +4,17 @@
         "own_single(A;C;*(a,b))"
     ],
     "own_single(A;B;a)&own_single(A;B;_)": [
-        "<strong>Đáp số:</strong> $a"
+        "<strong>Đáp số:</strong> $a ($B)"
+    ],
+    "own_single(A;B;a)&own_multi(A;B;b;_)": [
+        "Số $B $b $A có là:\n\t$a x $b = [*($a,$b)] ($B)\n",
+        "own_multi(A;B;b;*(a,b))"
+    ],
+    "own_multi(A;B;a;b)&own_multi(A;B;a;_)": [
+        "<strong>Đáp số:</strong> $b ($B)"
+    ],
+    "own_multi(A;B;a;b)&own_multi(A;B;a;b)": [
+        "Số $B mỗi $A có là:\n\t$b : $a = [//($b,$a)] ($B)\n",
+        "own_single(A;B;//(b,a))"
     ]
 }

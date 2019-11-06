@@ -1,11 +1,7 @@
 {
-    "mỗi.*\\d": "own_single",
-    "một.*\\d": "own_single",
-    "có.*\\d": "own_single",
-    "cho.*\\d": "own_single",
-    "có mấy": "own_single",
-    "có bao nhiêu": "own_single",
-    "còn lại mấy": "own_single",
-    "còn lại bao nhiêu": "own_single",
-    "\\d.*có\\d": "own_multi"
+    "^.*\\d.*có.*\\d": "own_multi",
+    "^.*\\d.*có bao nhiêu": "own_multi",
+    "^\\D*(mỗi|một).*\\d": "own_single",
+    "^\\D*(có|cho).*\\d": "own_single",
+    "^\\D*(có|còn lại)\\s+(mấy|bao nhiêu|mấy)": "own_single"
 }
