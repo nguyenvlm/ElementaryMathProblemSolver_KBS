@@ -14,7 +14,11 @@
         "<strong>Đáp số:</strong> $b ($B)"
     ],
     "own_multi(A;B;a;b)&own_multi(A;B;a;b)": [
-        "Số $B mỗi $A có là:\n\t$b : $a = [//($b,$a)] ($B)\n",
-        "own_single(A;B;//(b,a))"
+        "Số $B mỗi $A có là:\n\t$b : $a = [/($b,$a)] ($B)\n",
+        "own_single(A;B;/(b,a))"
+    ],
+    "own_single(A;B;a)&own_single(A;C;b)":[
+        "",
+        "own_multi(B;C;a;b)"
     ]
 }

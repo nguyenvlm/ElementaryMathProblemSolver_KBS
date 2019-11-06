@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from .utilities import read_json
+from .utilities import *
 from functools import reduce
 import os
 import re
+from decimal import Decimal
 
 
 class InferenceEngine:
@@ -55,17 +56,18 @@ class InferenceEngine:
         varProto = self.relations[rela]["var"]
         varSep = self.relations[rela]["split"]
         varFilter = self.relations[rela]["filter"]
-
-        clause = re.sub("\\s+", " ", clause)
+        for w in varFilter[:]:
+            varFilter.append(w[0].upper()+w[1:])
         clause = re.sub("(%s)" % ("|".join(varFilter)), "", clause)
 
-        numbers = re.findall("\d+", clause)
-        clause = re.sub("\d+", "", clause)
+        num_regex = r"[-+]?\d*\.\d+|\d+"
+        numbers = re.findall(num_regex, clause)
+        clause = re.sub(num_regex, "", clause)
 
         if isquery:
             clause = re.sub("(Hỏi|mấy|bao nhiêu|\?)", "", clause)
-
-        objects = [w for w in re.split("(%s)" % ("|".join(varSep)), clause) if len(w) > 0 and w not in varSep]
+        
+        objects = [re.sub("\\s+", " ",w.strip()) for w in re.split("(%s)" % ("|".join(varSep)), clause) if re.match("\\s*$", w) is None and w not in varSep]
         varList = []
 
         # print(objects)
@@ -73,9 +75,9 @@ class InferenceEngine:
         
         for v in range(len(varProto)-int(isquery)):
             if varProto[v].isupper():
-                varList.append(objects.pop(0).strip().lower())
+                varList.append(objects.pop(0))
             else:
-                varList.append(int(numbers.pop(0).strip()))
+                varList.append(Decimal(numbers.pop(0)))
         if isquery:
             varList.append(None)
         return {"name": rela, "var": varList}
@@ -98,22 +100,25 @@ class InferenceEngine:
                 varMap[chr(curnum)] = v
                 curnum += 1
         f2 = []
-        for v in F[j]["var"]:
-            if v not in F[i]["var"]:
-                if v is None:
-                    f2.append('_')
-                elif type(v) is str:
-                    f2.append(chr(curobj))
-                    varMap[chr(curobj)] = v
-                    curobj += 1
+        if i == j:
+            f2 = f1
+        else:
+            for v in F[j]["var"]:
+                if v not in F[i]["var"]:
+                    if v is None:
+                        f2.append('_')
+                    elif type(v) is str:
+                        f2.append(chr(curobj))
+                        varMap[chr(curobj)] = v
+                        curobj += 1
+                    else:
+                        f2.append(chr(curnum))
+                        varMap[chr(curnum)] = v
+                        curnum += 1
                 else:
-                    f2.append(chr(curnum))
-                    varMap[chr(curnum)] = v
-                    curnum += 1
-            else:
-                tmp = f1[F[i]["var"].index(v)]
-                f2.append(tmp)
-                varMap[tmp] = v
+                    tmp = f1[F[i]["var"].index(v)]
+                    f2.append(tmp)
+                    varMap[tmp] = v
         return varMap, "%s(%s)&%s(%s)" % (F[i]["name"], ';'.join(f1), F[j]["name"], ';'.join(f2))
     
     def getUnstrictRule(self, i, j):
@@ -168,7 +173,8 @@ class InferenceEngine:
                     if str(F[i])+ "&" + str(F[j]) in E:
                         continue
                     E.add(str(F[i])+ "&" + str(F[j]))
-                    for varMap, rule in (self.getStrictRule(i,j), self.getUnstrictRule(i,j)):
+                    Rules = [self.getStrictRule(i,j), self.getUnstrictRule(i,j)]
+                    for varMap, rule in Rules:
                         # print("ExploredRule::", rule)
                         # print("ExploredFact::",str(F[i])+ "&" + str(F[j]))
                         if rule in R:
@@ -205,8 +211,8 @@ class InferenceEngine:
                                 else:
                                     desc = desc.replace('$'+v, str(varMap[v]))
 
-                            for opans in [self.opmap[o[1:o.index('(')]](int(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
-                                desc = re.sub('\[.*\]', str(opans), desc)
+                            for opans in [self.opmap[o[1:o.index('(')]](Decimal(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
+                                desc = re.sub('\[.*\]', decimalZeroStrip(str(opans)), desc)
                             self.answer += desc
                             break
                     if match: break

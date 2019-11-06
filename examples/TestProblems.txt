@@ -1,1 +1,5 @@
 Mỗi giờ có 50 trẻ sơ sinh chào đời. Biết một năm có 365 ngày, mỗi ngày có 24 giờ. Hỏi 10 năm có bao nhiêu trẻ sơ sinh chào đời?
+
+Một tổ công nhân có 13 thợ máy. Biết cứ 10 thợ máy thì có 100 sản phẩm cần hoàn thành mỗi ngày. Hỏi 5 tổ công nhân có bao nhiêu sản phẩm cần hoàn thành mỗi ngày?
+
+Một tốp công nhân cần 5 giờ để hoàn thành một công việc. Biết mỗi tốp công nhân có 5 người. Hỏi mỗi người cần bao nhiêu giờ để hoàn thành một công việc?
