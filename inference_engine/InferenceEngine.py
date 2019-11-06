@@ -142,10 +142,10 @@ class InferenceEngine:
                         # print("Rule match::", rule)
 
                         # Delete old facts:
-                        # if i < j:
-                        #     i, j = j, i
-                        # F.pop(i)
-                        # F.pop(j)
+                        if i < j:
+                            i, j = j, i
+                        F.pop(i)
+                        F.pop(j)
                         tmp = R[rule]
 
                         # Get new fact
