@@ -1,7 +1,7 @@
 {
     "^.*\\d.*có.*\\d": "own_multi",
-    "^.*\\d.*có bao nhiêu": "own_multi",
+    "^.*\\d.*có\\s+(mấy|bao nhiêu)": "own_multi",
     "^\\D*(mỗi|một).*\\d": "own_single",
     "^\\D*(có|cho).*\\d": "own_single",
-    "^\\D*(có|còn lại)\\s+(mấy|bao nhiêu|mấy)": "own_single"
+    "^\\D*(có|còn lại)\\s+(mấy|bao nhiêu)": "own_single"
 }

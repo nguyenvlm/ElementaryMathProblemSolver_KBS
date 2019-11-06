@@ -1,0 +1,1 @@
+Mỗi giờ có 50 trẻ sơ sinh chào đời. Biết một năm có 365 ngày, mỗi ngày có 24 giờ. Hỏi 10 năm có bao nhiêu trẻ sơ sinh chào đời?
