@@ -4,7 +4,7 @@ from .utilities import *
 from functools import reduce
 import os
 import re
-from decimal import Decimal
+from fractions import Fraction
 
 
 class InferenceEngine:
@@ -16,18 +16,28 @@ class InferenceEngine:
         self.relations = read_json(kbmodel_dir_path + 'relations.json')
         self.rules = read_json(kbmodel_dir_path + 'rules.json')
         self.patterns = read_json(kbmodel_dir_path + 'patterns.json')
+        self.opmap = {
+            '+': lambda a: reduce(lambda x, y: x+y, a),
+            '-': lambda a: reduce(lambda x, y: x-y, a),
+            '*': lambda a: reduce(lambda x, y: x*y, a),
+            '//': lambda a: reduce(lambda x, y: x//y, a),
+            '/': lambda a: reduce(lambda x,y: x/y, a)
+        }
         self.facts = []
         self.queries = []
-        self.opmap = {
-            '+': lambda a: numericZeroStrip(reduce(lambda x, y: x+y, a)),
-            '-': lambda a: numericZeroStrip(reduce(lambda x, y: x-y, a)),
-            '*': lambda a: numericZeroStrip(reduce(lambda x, y: x*y, a)),
-            '//': lambda a: numericZeroStrip(reduce(lambda x, y: x//y, a)),
-            '/': lambda a: numericZeroStrip(reduce(lambda x,y: x/y, a))
-        }
         self.answer = ''
+    
+    def __repr__(self):
+        return '<%s.%s object at %s>' % (
+            self.__class__.__module__,
+            self.__class__.__name__,
+            hex(id(self))
+        )
 
     def fit(self, input_str):
+        self.facts = []
+        self.queries = []
+        self.answer = ''
         clauses = input_str.replace(',', '.').split('.')
         for clause in clauses:
             words = clause.split()
@@ -60,7 +70,7 @@ class InferenceEngine:
             varFilter.append(w[0].upper()+w[1:])
         clause = re.sub("(%s)" % ("|".join(varFilter)), "", clause)
 
-        num_regex = r"[-+]?\d*\.\d+|\d+"
+        num_regex = r"[-+]?\d*[\.\/]?\d+|\d+"
         numbers = re.findall(num_regex, clause)
         clause = re.sub(num_regex, "", clause)
 
@@ -77,7 +87,13 @@ class InferenceEngine:
             if varProto[v].isupper():
                 varList.append(objects.pop(0))
             else:
-                varList.append(Decimal(numbers.pop(0)))
+                tmp = re.split(r"(\/|\.)",numbers.pop(0))
+                if len(tmp) == 1:
+                    varList.append(Fraction(tmp[0]))
+                elif tmp[1] == '/':
+                    varList.append(Fraction(tmp[0], tmp[2]))
+                else:
+                    varList.append(Fraction(tmp[0]) + Fraction(tmp[2]))
         if isquery:
             varList.append(None)
         return {"name": rela, "var": varList}
@@ -201,7 +217,7 @@ class InferenceEngine:
                                         new_fact["var"][ind] = varMap[v]
                                     else:
                                         func = self.opmap[v[:v.index('(')]]
-                                        new_fact["var"][ind] = func([Decimal(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
+                                        new_fact["var"][ind] = func([Fraction(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
                                 F.append(new_fact)
                             # Add to answer
                             desc = tmp[0]
@@ -209,11 +225,12 @@ class InferenceEngine:
                                 if v.isupper():
                                     desc = desc.replace('$'+v, varMap[v])
                                 else:
-                                    print(DecimalToFraction(varMap[v]))
-                                    desc = desc.replace('$'+v, str(varMap[v]))
-
-                            for opans in [self.opmap[o[1:o.index('(')]](Decimal(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
-                                desc = re.sub('\[.*\]', str(opans), desc)
+                                    tmp = str(Fraction(varMap[v]))
+                                    desc = desc.replace('$'+v, tmp)
+                            
+                            for opans in [self.opmap[o[1:o.index('(')]](Fraction(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
+                                tmp = str(Fraction(opans))
+                                desc = re.sub('\[.*\]', tmp, desc)
                             self.answer += desc
                             break
                     if match: break
