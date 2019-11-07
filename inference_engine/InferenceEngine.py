@@ -209,6 +209,7 @@ class InferenceEngine:
                                 if v.isupper():
                                     desc = desc.replace('$'+v, varMap[v])
                                 else:
+                                    print(DecimalToFraction(varMap[v]))
                                     desc = desc.replace('$'+v, str(varMap[v]))
 
                             for opans in [self.opmap[o[1:o.index('(')]](Decimal(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:

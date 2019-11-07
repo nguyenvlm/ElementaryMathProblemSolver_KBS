@@ -2,18 +2,24 @@
 
 import json
 from math import gcd
+from decimal import Decimal
 
-def DecimalToFraction(Number, Max = 1000000):
+def DecimalToFraction(Number, Max = 10000):
+    print('start')
+    print('~~~~~~~', Number)
+    Number = float(Number)
+    print('end')
     a,b = (0,1),(1,0)
     while True:
         mid = (a[0]+b[0],a[1]+b[1])
         if mid[1]//gcd(*mid) > Max: 
-            if abs(a[0]/a[1]-Number) < abs(b[0]/b[1]-Number): return str(a[0])+'/'+str(a[1])
-            else: return str(b[0])+'/'+str(b[1])
+            if abs(a[0]/a[1]-Number) < abs(b[0]/b[1]-Number): 
+                return str(a[0]) + ('/'+str(a[1]) if a[1] != 1 else '')
+            else: 
+                return str(b[0]) + ('/'+str(b[1]) if b[1] != 1 else '')
             break
         if Number <= mid[0]/mid[1]: b = mid
         else: a = mid
-
 
 def read_json(path):
     json_value = None
