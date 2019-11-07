@@ -19,11 +19,11 @@ class InferenceEngine:
         self.facts = []
         self.queries = []
         self.opmap = {
-            '+': lambda a: reduce(lambda x, y: x+y, a),
-            '-': lambda a: reduce(lambda x, y: x-y, a),
-            '*': lambda a: reduce(lambda x, y: x*y, a),
-            '//': lambda a: reduce(lambda x, y: x//y, a),
-            '/': lambda a: reduce(lambda x,y: x/y, a)
+            '+': lambda a: numericZeroStrip(reduce(lambda x, y: x+y, a)),
+            '-': lambda a: numericZeroStrip(reduce(lambda x, y: x-y, a)),
+            '*': lambda a: numericZeroStrip(reduce(lambda x, y: x*y, a)),
+            '//': lambda a: numericZeroStrip(reduce(lambda x, y: x//y, a)),
+            '/': lambda a: numericZeroStrip(reduce(lambda x,y: x/y, a))
         }
         self.answer = ''
 
@@ -67,7 +67,7 @@ class InferenceEngine:
         if isquery:
             clause = re.sub("(Hỏi|mấy|bao nhiêu|\?)", "", clause)
         
-        objects = [re.sub("\\s+", " ",w.strip()) for w in re.split("(%s)" % ("|".join(varSep)), clause) if re.match("\\s*$", w) is None and w not in varSep]
+        objects = [re.sub("\\s+", " ",w.strip()).lower() for w in re.split("(%s)" % ("|".join(varSep)), clause) if re.match("\\s*$", w) is None and w not in varSep]
         varList = []
 
         # print(objects)
@@ -159,11 +159,12 @@ class InferenceEngine:
         return varMap, "%s(%s)&%s(%s)" % (F[i]["name"], ';'.join(f1), F[j]["name"], ';'.join(f2))
         
     def infer(self):
+        Q = self.queries
         F = self.facts
-        F.extend(self.queries)
         R = self.rules
         E = set() # Explored Rules
-        nquery = len(self.queries)
+        F.extend(Q)
+        nquery = len(Q)
         while nquery:
             match = False
             rule = None
@@ -200,8 +201,7 @@ class InferenceEngine:
                                         new_fact["var"][ind] = varMap[v]
                                     else:
                                         func = self.opmap[v[:v.index('(')]]
-                                        new_fact["var"][ind] = func(
-                                            [varMap[item] for item in v[v.index('(')+1:-1].split(',')])
+                                        new_fact["var"][ind] = func([Decimal(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
                                 F.append(new_fact)
                             # Add to answer
                             desc = tmp[0]
@@ -212,7 +212,7 @@ class InferenceEngine:
                                     desc = desc.replace('$'+v, str(varMap[v]))
 
                             for opans in [self.opmap[o[1:o.index('(')]](Decimal(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
-                                desc = re.sub('\[.*\]', decimalZeroStrip(str(opans)), desc)
+                                desc = re.sub('\[.*\]', str(opans), desc)
                             self.answer += desc
                             break
                     if match: break

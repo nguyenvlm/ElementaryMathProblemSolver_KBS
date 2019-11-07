@@ -10,7 +10,16 @@ def read_json(path):
         json_value = json.loads(json_string)
     return json_value
 
-def decimalZeroStrip(dec_str):
-    if '.' in dec_str:
-        return dec_str.rstrip('0').rstrip('.')
-    return dec_str
+def numericZeroStrip(num):
+    dtype = type(num)
+    nparts = str(num).split('.')
+    if len(nparts) > 2:
+        return dtype(0)
+    ipart = nparts[0].lstrip('0')
+    if ipart == '': ipart = '0'
+    if len(nparts) > 1:
+        dpart = nparts[1].rstrip('0')
+        if dpart == '':
+            return dtype(ipart)
+        return dtype("%s.%s"%(ipart, dpart))
+    return dtype(ipart)
