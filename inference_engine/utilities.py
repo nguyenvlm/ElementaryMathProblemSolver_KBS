@@ -3,16 +3,17 @@
 import json
 from math import gcd
 
-def DecimalToFraction(Max,n):
+def DecimalToFraction(Number, Max = 1000000):
     a,b = (0,1),(1,0)
     while True:
         mid = (a[0]+b[0],a[1]+b[1])
         if mid[1]//gcd(*mid) > Max: 
-            if abs(a[0]/a[1]-n) < abs(b[0]/b[1]-n): return str(a[0])+'/'+str(a[1])
+            if abs(a[0]/a[1]-Number) < abs(b[0]/b[1]-Number): return str(a[0])+'/'+str(a[1])
             else: return str(b[0])+'/'+str(b[1])
             break
-        if n <= mid[0]/mid[1]: b = mid
+        if Number <= mid[0]/mid[1]: b = mid
         else: a = mid
+
 
 def read_json(path):
     json_value = None
