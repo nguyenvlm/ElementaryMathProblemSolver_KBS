@@ -20,5 +20,21 @@
     "own_single(A;B;a)&own_single(A;C;b)":[
         "",
         "own_multi(B;C;a;b)"
+    ],
+    "own_more(A;B;C;a)&own_more(A;B;C;a)":[
+        "",
+        "own_less(B;A;C;a)"
+    ],
+    "own_less(A;B;C;a)&own_less(A;B;C;a)":[
+        "",
+        "own_more(B;A;C;a)"
+    ],
+    "own_single(A;B;a)&own_more(A;C;B;b)":[
+        "Số $B $C có là:\n\t$a - $b = [-($a,$b)] ($B)\n",
+        "own_single(C;B;-(a,b))"
+    ],
+    "own_single(A;B;a)&own_less(A;C;B;b)":[
+        "Số $B $C có là:\n\t$a + $b = [+($a,$b)] ($B)\n",
+        "own_single(C;B;+(a,b))"
     ]
 }

@@ -38,7 +38,7 @@ class InferenceEngine:
         self.facts = []
         self.queries = []
         self.answer = ''
-        clauses = input_str.replace(',', '.').split('.')
+        clauses = filter(lambda c: len(c), input_str.strip().replace(',', '.').split('.'))
         for clause in clauses:
             words = clause.split()
             isquery = "?" in clause or clause.lower().find("hỏi") != -1
@@ -49,14 +49,16 @@ class InferenceEngine:
                     rela = self.patterns[regex]
                     fact = self.getFact(rela, clause, isquery)
                     if fact is None:
-                        return "Có lỗi trong biểu diễn tri thức."
+                        return "Có lỗi trong phân tích dữ kiện của giả thiết \"%s\"." % (clause)
                     if isquery:
                         self.queries.append(fact)
                     else:
                         self.facts.append(fact)
                     break
             if not found:
-                return "Không thể nhận dạng câu hỏi \"%s\"." % (clause) if isquery else "Không thể nhận dạng giả thiết \"%s\"." % (clause)
+                if isquery:
+                    return "Không thể nhận dạng câu hỏi \"%s\"." % (clause)
+                return "Không thể nhận dạng giả thiết \"%s\"." % (clause)
         self.infer()
         return self.answer
 
@@ -72,12 +74,18 @@ class InferenceEngine:
 
         num_regex = r"[-+]?\d*[\.\/]?\d+|\d+"
         numbers = re.findall(num_regex, clause)
-        clause = re.sub(num_regex, "", clause)
+        # clause = re.sub(num_regex, "", clause)
 
         if isquery:
             clause = re.sub("(Hỏi|mấy|bao nhiêu|\?)", "", clause)
         
-        objects = [re.sub("\\s+", " ",w.strip()).lower() for w in re.split("(%s)" % ("|".join(varSep)), clause) if re.match("\\s*$", w) is None and w not in varSep]
+        objects = [
+            re.sub("\\s+", " ", re.sub(num_regex, "", w.lower())).strip()
+            for w in re.split("(%s)" % ("|".join(varSep)), clause)
+        ]
+
+        objects = list(filter( lambda w: all((len(w), re.match("\\s*$", w) is None, w not in varSep)), objects))
+
         varList = []
 
         # print(objects)
@@ -85,8 +93,12 @@ class InferenceEngine:
         
         for v in range(len(varProto)-int(isquery)):
             if varProto[v].isupper():
+                if len(objects) == 0: 
+                    return None
                 varList.append(objects.pop(0))
             else:
+                if len(numbers) == 0:
+                    return None
                 tmp = re.split(r"(\/|\.)",numbers.pop(0))
                 if len(tmp) == 1:
                     varList.append(Fraction(tmp[0]))
@@ -96,7 +108,11 @@ class InferenceEngine:
                     varList.append(Fraction(tmp[0]) + Fraction(tmp[2]))
         if isquery:
             varList.append(None)
-        return {"name": rela, "var": varList}
+
+        new_fact = {"name": rela, "var": varList}
+
+        # print(new_fact)
+        return new_fact
     
     def getStrictRule(self, i, j):
         F = self.facts
@@ -178,18 +194,22 @@ class InferenceEngine:
         Q = self.queries
         F = self.facts
         R = self.rules
-        E = set() # Explored Rules
+        ER = set() # Explored Rules
+        EF = set(map(str, F)) # Explored Facts
         F.extend(Q)
         nquery = len(Q)
+        if nquery == 0:
+            self.answer += "\n\nKhông tìm thấy câu hỏi trong đề bài!\n\nBài toán không có yêu cầu gì để giải quyết!"
+            return
         while nquery:
             match = False
             rule = None
             # print("F::", F)
             for i in range(len(F)):
                 for j in range(len(F)):
-                    if str(F[i])+ "&" + str(F[j]) in E:
+                    if str(F[i])+ "&" + str(F[j]) in ER:
                         continue
-                    E.add(str(F[i])+ "&" + str(F[j]))
+                    ER.add(str(F[i])+ "&" + str(F[j]))
                     Rules = [self.getStrictRule(i,j), self.getUnstrictRule(i,j)]
                     for varMap, rule in Rules:
                         # print("ExploredRule::", rule)
@@ -218,7 +238,9 @@ class InferenceEngine:
                                     else:
                                         func = self.opmap[v[:v.index('(')]]
                                         new_fact["var"][ind] = func([Fraction(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
-                                F.append(new_fact)
+                                if str(new_fact) not in EF:
+                                    EF.add(str(new_fact))
+                                    F.append(new_fact)
                             # Add to answer
                             desc = tmp[0]
                             for v in varMap:

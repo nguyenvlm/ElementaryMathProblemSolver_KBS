@@ -2,11 +2,21 @@
     "own_single": {
         "var": ["A", "B", "x"],
         "filter": ["mỗi", "một", "biết", "như thế"],
-        "split": ["có", "cho", "thì", "cần", "hết", "gồm"]
+        "split": ["có", "cho", "thì", "cần", "hết", "gồm", "cứ"]
     },
     "own_multi": {
         "var": ["A", "B", "x", "y"],
         "filter": ["biết", "cho", "cứ", "như thế"],
-        "split": ["có", "cho", "thì", "cần", "hết"]
+        "split": ["có", "cho", "thì", "cần", "hết", "cứ"]
+    },
+    "own_more": {
+        "var": ["A", "B", "C", "x"],
+        "filter": ["biết", "cho", "cứ", "như thế"],
+        "split": ["nhiều", "hơn", "\\d+"]
+    },
+    "own_less": {
+        "var": ["A", "B", "C", "x"],
+        "filter": ["biết", "cho", "cứ", "như thế"],
+        "split": ["ít", "kém", "hơn", "\\d+"]
     }
 }
