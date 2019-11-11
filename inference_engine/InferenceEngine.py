@@ -23,6 +23,7 @@ class InferenceEngine:
             '//': lambda a: reduce(lambda x, y: x//y, a),
             '/': lambda a: reduce(lambda x,y: x/y, a)
         }
+        self.dictonary = []
         self.facts = []
         self.queries = []
         self.answer = ''
@@ -35,6 +36,7 @@ class InferenceEngine:
         )
 
     def fit(self, input_str):
+        self.dictonary = []
         self.facts = []
         self.queries = []
         self.answer = ''
@@ -59,6 +61,12 @@ class InferenceEngine:
                 if isquery:
                     return "Không thể nhận dạng câu hỏi \"%s\"." % (clause)
                 return "Không thể nhận dạng giả thiết \"%s\"." % (clause)
+        
+        # print('dictonary', self.dictonary)
+        # print('fact')
+        # for i in self.facts:
+        #     print(i)
+        # print('queries',self.queries)
         self.infer()
         return self.answer
 
@@ -90,7 +98,35 @@ class InferenceEngine:
 
         # print(objects)
         # print(numbers)
-        
+
+        for objects_ind in range(len(objects)):
+            if objects[objects_ind] in self.dictonary: continue
+            Avalable = False
+            # print('--',objects[objects_ind])
+            for dictonary_ind in range(len(self.dictonary)):
+                if self.dictonary[dictonary_ind].find(objects[objects_ind]) == 0:
+                    objects[objects_ind] = self.dictonary[dictonary_ind]
+                    Avalable = True
+                elif objects[objects_ind].find(self.dictonary[dictonary_ind]) == 0:
+                    # print('fail in ',objects[objects_ind])
+                    # print('fact')
+                    # for i in self.facts:
+                    #     print(i)
+                    for ind in range(len(self.facts)):
+                        for var_ind in range(len(self.facts[ind]['var'])):
+                            if self.facts[ind]['var'][var_ind] == self.dictonary[dictonary_ind]:
+                                self.facts[ind]['var'][var_ind] = objects[objects_ind]
+                    self.dictonary[dictonary_ind] = objects[objects_ind]
+                    # print('fact')
+                    # for i in self.facts:
+                    #     print(i)
+                    Avalable = True
+            if not Avalable:
+                self.dictonary.append(objects[objects_ind])
+
+        # print(objects)
+        # print(numbers)
+
         for v in range(len(varProto)-int(isquery)):
             if varProto[v].isupper():
                 if len(objects) == 0: 
@@ -112,6 +148,7 @@ class InferenceEngine:
         new_fact = {"name": rela, "var": varList}
 
         # print(new_fact)
+        # print('dictonary',self.dictonary)
         return new_fact
     
     def getStrictRule(self, i, j):
