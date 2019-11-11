@@ -5,3 +5,7 @@ Một tổ công nhân có 13 thợ máy. Biết cứ 10 thợ máy thì có 100
 Một tốp công nhân cần 5 giờ để hoàn thành một công việc. Biết mỗi tốp công nhân có 5 người. Hỏi mỗi người cần bao nhiêu giờ để hoàn thành một công việc?
 
 Mỗi ngày có 80 người mất vì tai nạn giao thông. Biết một năm có 365 ngày. Hỏi 10 năm có bao nhiêu người mất vì tai nạn giao thông?
+
+Tú hơn Bình 2 tuổi. Bình kém chị Bình 10 tuổi. Biết chị Bình được 23 tuổi. Hỏi Tú được bao nhiêu tuổi?
+
+Huy có 8 viên bi. Biết Bình có nhiều hơn Huy 23 viên bi. Hỏi Bình có bao nhiêu viên bi?

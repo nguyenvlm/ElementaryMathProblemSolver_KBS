@@ -1,6 +1,6 @@
 {
-    "^.*\\d.*(có|cho|cần)(.*\\d|\\s+(mấy|bao nhiêu))": "own_multi",
-    "^\\D*((mỗi|một)\\D*)?(có|cho|cần)(.*\\d|\\s+(mấy|bao nhiêu))" : "own_single",
-    "^\\D+(ít hơn|kém hơn)\\s+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_less",
-    "^\\D+(hơn|nhiều hơn)\\s+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_more"
+    "^\\D+(ít hơn|kém hơn|nhỏ hơn|kém)\\D+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_less",
+    "^\\D+(hơn|nhiều hơn|lớn hơn)\\D+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_more",
+    "^.*\\d.*(có|cho|cần|được)(.*\\d|\\s+(mấy|bao nhiêu))": "own_multi",
+    "^\\D*((mỗi|một)\\D*)?(có|cho|cần|được)(.*\\d|\\s+(mấy|bao nhiêu))" : "own_single"
 }

@@ -22,8 +22,8 @@ while running:
         print(engine.answer)
         print("An error has occured! Here is the error details:")
         try:
+            traceback.print_tb(ex.__traceback__, file=sys.stdout)
             print(ex)
-            # traceback.print_tb(ex.__traceback__, file=sys.stdout)
         except Exception as another_ex:
             print("Another error has occured::", another_ex)
     finally:

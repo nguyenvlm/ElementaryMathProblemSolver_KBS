@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
-from .utilities import *
-from functools import reduce
 import os
 import re
+from .utilities import *
+from functools import reduce
 from fractions import Fraction
+from queue import SimpleQueue
 
 
 class InferenceEngine:
@@ -42,6 +43,7 @@ class InferenceEngine:
         self.answer = ''
         clauses = filter(lambda c: len(c), input_str.strip().replace(',', '.').split('.'))
         for clause in clauses:
+            clause = clause.strip()
             words = clause.split()
             isquery = "?" in clause or clause.lower().find("hỏi") != -1
             found = False
@@ -232,7 +234,8 @@ class InferenceEngine:
         F = self.facts
         R = self.rules
         ER = set() # Explored Rules
-        EF = set(map(str, F)) # Explored Facts
+        EF = dict((str(f), []) for f in F) # mapping explored fact => predecessor facts
+        FS = dict() # mapping consequent fact => its natural language inference
         F.extend(Q)
         nquery = len(Q)
         if nquery == 0:
@@ -253,17 +256,14 @@ class InferenceEngine:
                         # print("ExploredFact::",str(F[i])+ "&" + str(F[j]))
                         if rule in R:
                             match = True
+                            new_fact = None
+                            tmp = R[rule]
                             if None in F[i]["var"] + F[j]["var"] and F[i]["name"] == F[j]["name"]:
                                 nquery -= 1
-                            # print("Rule match::", rule)
-                            # Delete old facts:
-                            # if i < j:
-                            #     i, j = j, i
-                            # F.pop(i)
-                            # if len(F): F.pop(j)
-                            tmp = R[rule]
+                                new_fact = "$"
+                                # print("Rule match::", rule)
                             # Create new fact
-                            if len(tmp) > 1:
+                            elif len(tmp) > 1:
                                 new_fact = {
                                     "name": tmp[1][: tmp[1].index("(")],
                                     "var": tmp[1][tmp[1].index("(")+1: -1].split(';')
@@ -275,10 +275,9 @@ class InferenceEngine:
                                     else:
                                         func = self.opmap[v[:v.index('(')]]
                                         new_fact["var"][ind] = func([Fraction(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
-                                if str(new_fact) not in EF:
-                                    EF.add(str(new_fact))
-                                    F.append(new_fact)
-                            # Add to answer
+                                if str(new_fact) in EF:
+                                    continue
+                            # Get desc (NL inferences)
                             desc = tmp[0]
                             for v in varMap:
                                 if v.isupper():
@@ -290,6 +289,9 @@ class InferenceEngine:
                             for opans in [self.opmap[o[1:o.index('(')]](Fraction(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
                                 tmp = str(Fraction(opans))
                                 desc = re.sub('\[.*\]', tmp, desc)
+                            EF[str(new_fact)] = [str(F[i]), str(F[j])]
+                            FS[str(new_fact)] = desc
+                            F.append(new_fact)
                             self.answer += desc
                             break
                     if match: break
@@ -297,7 +299,27 @@ class InferenceEngine:
             if not match:
                 self.answer += "\n\nKhông thể tiếp tục quá trình suy luận!"
                 return
-
+        
+        # Traceback the optimal solution (BFS):
+        # print(FS)
+        tmpAnswer = ""
+        q = SimpleQueue()
+        q.put("$")
+        visited = set()
+        while not q.empty():
+            u = q.get()
+            # print(u)
+            if u in visited:
+                continue
+            visited.add(u)
+            if u not in FS:
+                self.answer += "\n\nCó lỗi trong quá trình tối giản lời giải!"
+                return
+            tmpAnswer = FS[u] + tmpAnswer
+            for v in EF[u]:
+                if v in EF and len(EF[v]) > 0:
+                    q.put(v)
+        self.answer = tmpAnswer
 
 if __name__ == "__main__":
     while True:
