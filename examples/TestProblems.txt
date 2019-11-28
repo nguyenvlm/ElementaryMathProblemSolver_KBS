@@ -8,4 +8,10 @@ Mỗi ngày có 80 người mất vì tai nạn giao thông. Biết một năm c
 
 Tú hơn Bình 2 tuổi. Bình kém chị Bình 10 tuổi. Biết chị Bình được 23 tuổi. Hỏi Tú được bao nhiêu tuổi?
 
-Huy có 8 viên bi. Biết Bình có nhiều hơn Huy 23 viên bi. Hỏi Bình có bao nhiêu viên bi?
+Huy có 8 viên bi. Biết Bình có nhiều hơn Huy 14 viên bi. Hỏi Bình có bao nhiêu viên bi?
+
+Huy có 8 viên bi. Bình cho Huy 23 viên bi. Hỏi Huy có bao nhiêu viên bi?
+
+Ngọc có 15 viên kẹo. Ngọc cho Phú 3 viên. Hỏi Ngọc còn lại mấy viên kẹo?
+
+Ngọc có 15 viên kẹo. Ngọc cho Phú 3 viên. Ngọc cho Minh 11 viên. Ba cho Ngọc lại 7 viên. Hỏi Ngọc có tất cả bao nhiêu viên kẹo?

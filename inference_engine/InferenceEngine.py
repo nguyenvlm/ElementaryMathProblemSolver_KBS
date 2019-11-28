@@ -17,6 +17,7 @@ class InferenceEngine:
         self.relations = read_json(kbmodel_dir_path + 'relations.json')
         self.rules = read_json(kbmodel_dir_path + 'rules.json')
         self.patterns = read_json(kbmodel_dir_path + 'patterns.json')
+        self.filter = read_json(kbmodel_dir_path + 'filter.json')
         self.opmap = {
             '+': lambda a: reduce(lambda x, y: x+y, a),
             '-': lambda a: reduce(lambda x, y: x-y, a),
@@ -75,9 +76,10 @@ class InferenceEngine:
     def getFact(self, rela, clause, isquery=False):
         if rela not in self.relations:
             return None
+        
         varProto = self.relations[rela]["var"]
         varSep = self.relations[rela]["split"]
-        varFilter = self.relations[rela]["filter"]
+        varFilter = self.relations[rela]["filter"] + self.filter["general"]
         for w in varFilter[:]:
             varFilter.append(w[0].upper()+w[1:])
         clause = re.sub("(%s)" % ("|".join(varFilter)), "", clause)
@@ -98,6 +100,7 @@ class InferenceEngine:
 
         varList = []
 
+        # print(rela)
         # print(objects)
         # print(numbers)
 
@@ -236,7 +239,7 @@ class InferenceEngine:
         ER = set() # Explored Rules
         EF = dict((str(f), []) for f in F) # mapping explored fact => predecessor facts
         FS = dict() # mapping consequent fact => its natural language inference
-        F.extend(Q)
+        RF = set() # Removed Facts
         nquery = len(Q)
         if nquery == 0:
             self.answer += "\n\nKhông tìm thấy câu hỏi trong đề bài!\n\nBài toán không có yêu cầu gì để giải quyết!"
@@ -244,9 +247,11 @@ class InferenceEngine:
         while nquery:
             match = False
             rule = None
-            # print("F::", F)
+            # print("F::",*F, sep="\n")
             for i in range(len(F)):
+                if str(F[i]) in RF: continue
                 for j in range(len(F)):
+                    if str(F[j]) in RF: continue
                     if str(F[i])+ "&" + str(F[j]) in ER:
                         continue
                     ER.add(str(F[i])+ "&" + str(F[j]))
@@ -256,17 +261,17 @@ class InferenceEngine:
                         # print("ExploredFact::",str(F[i])+ "&" + str(F[j]))
                         if rule in R:
                             match = True
-                            new_fact = None
+                            new_facts = []
                             tmp = R[rule]
                             if None in F[i]["var"] + F[j]["var"] and F[i]["name"] == F[j]["name"]:
                                 nquery -= 1
-                                new_fact = "$"
+                                new_facts.append("$")
                                 # print("Rule match::", rule)
                             # Create new fact
-                            elif len(tmp) > 1:
+                            for fp in tmp["add"]: # New Fact's prototype
                                 new_fact = {
-                                    "name": tmp[1][: tmp[1].index("(")],
-                                    "var": tmp[1][tmp[1].index("(")+1: -1].split(';')
+                                    "name": fp[: fp.index("(")],
+                                    "var": fp[fp.index("(")+1: -1].split(';')
                                 }
                                 for ind in range(len(new_fact["var"])):
                                     v = new_fact["var"][ind]
@@ -275,30 +280,42 @@ class InferenceEngine:
                                     else:
                                         func = self.opmap[v[:v.index('(')]]
                                         new_fact["var"][ind] = func([Fraction(varMap[item]) for item in v[v.index('(')+1:-1].split(',')])
-                                if str(new_fact) in EF:
-                                    continue
+                                new_facts.append(new_fact)
+                            if all(str(new_fact) in EF for new_fact in new_facts):
+                                continue
+                            
+                            # Mark outdated facts which were parts of the current rule as being removed
+                            for findex in tmp["remove"]:
+                                if findex == 1:
+                                    RF.add(str(F[i]))
+                                elif findex == 2:
+                                    RF.add(str(F[j]))
+                            
                             # Get desc (NL inferences)
-                            desc = tmp[0]
+                            desc = tmp["desc"]
                             for v in varMap:
                                 if v.isupper():
                                     desc = desc.replace('$'+v, varMap[v])
                                 else:
-                                    tmp = str(Fraction(varMap[v]))
-                                    desc = desc.replace('$'+v, tmp)
-                            
+                                    desc = desc.replace('$'+v, str(Fraction(varMap[v])))
                             for opans in [self.opmap[o[1:o.index('(')]](Fraction(t) for t in o[o.index('(')+1:-2].split(',')) for o in re.findall('\[.*\]', desc)]:
-                                tmp = str(Fraction(opans))
-                                desc = re.sub('\[.*\]', tmp, desc)
-                            EF[str(new_fact)] = [str(F[i]), str(F[j])]
-                            FS[str(new_fact)] = desc
-                            F.append(new_fact)
+                                desc = re.sub('\[.*\]', str(Fraction(opans)), desc)
                             self.answer += desc
+                            for new_fact in new_facts:
+                                FS[str(new_fact)] = desc
+                                EF[str(new_fact)] = [str(F[i]), str(F[j])]
+                                F.append(new_fact)
                             break
                     if match: break
-                if match: break
+                if match: break       
             if not match:
-                self.answer += "\n\nKhông thể tiếp tục quá trình suy luận!"
-                return
+                if len(Q):
+                    F.extend(Q)
+                    Q = []
+                    match = True
+                else:
+                    self.answer += "\n\nKhông thể tiếp tục quá trình suy luận!\n\n"
+                    return
         
         # Traceback the optimal solution (BFS):
         # print(FS)

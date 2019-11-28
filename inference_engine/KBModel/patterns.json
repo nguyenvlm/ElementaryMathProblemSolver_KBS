@@ -1,6 +1,8 @@
 {
+    "^\\D*(cho|đưa|tặng|biếu|phát|thưởng)+(\\D+\\d+\\D+|\\s+(mấy|bao nhiêu))": "give_single",
+    "^\\D*(nhận|lấy)+(của|từ)?(\\D+\\d+\\D+|\\s+(mấy|bao nhiêu))": "take_single",
     "^\\D+(ít hơn|kém hơn|nhỏ hơn|kém)\\D+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_less",
     "^\\D+(hơn|nhiều hơn|lớn hơn)\\D+(\\D+\\s+\\d|bao nhiêu|mấy)": "own_more",
-    "^.*\\d.*(có|cho|cần|được)(.*\\d|\\s+(mấy|bao nhiêu))": "own_multi",
-    "^\\D*((mỗi|một)\\D*)?(có|cho|cần|được)(.*\\d|\\s+(mấy|bao nhiêu))" : "own_single"
+    "^.*\\d.*(có|cần|được|tất cả|còn lại)+(.*\\d|\\s+(mấy|bao nhiêu))": "own_multi",
+    "^\\D*((mỗi|một)\\D*)?(có|cho|cần|được|tất cả|còn lại)+(.*\\d|\\s+(mấy|bao nhiêu))" : "own_single"
 }

@@ -1,22 +1,42 @@
 {
     "own_single": {
         "var": ["A", "B", "x"],
-        "filter": ["trong","mỗi", "một", "biết", "như thế"],
-        "split": ["có", "cho", "thì", "cần", "hết", "gồm", "cứ", "được"]
+        "filter": [],
+        "split": ["có", "thì", "cần", "hết", "gồm", "cứ", "được", "còn"]
     },
     "own_multi": {
         "var": ["A", "B", "x", "y"],
-        "filter": ["trong","biết", "cho", "cứ", "như thế"],
-        "split": ["có", "cho", "thì", "cần", "hết", "cứ", "được"]
+        "filter": [],
+        "split": ["có", "thì", "cần", "hết", "cứ", "được", "còn"]
     },
     "own_more": {
         "var": ["A", "B", "C", "x"],
-        "filter": ["trong","biết", "cho", "cứ", "như thế", "một"],
-        "split": ["nhiều", "hơn", "\\d+"]
+        "filter": [],
+        "split": ["có", "nhiều", "hơn", "\\d+"]
     },
     "own_less": {
         "var": ["A", "B", "C", "x"],
-        "filter": ["trong","biết", "cho", "cứ", "như thế", "một"],
-        "split": ["ít", "kém", "hơn", "\\d+"]
+        "filter": [],
+        "split": ["có", "ít", "kém", "hơn", "\\d+"]
+    },
+    "give_single": {
+        "var": ["A", "B", "C", "x"],
+        "filter": [],
+        "split": ["cho", "đưa", "tặng", "biếu", "phát", "thưởng", "\\d+"]
+    },
+    "take_single": {
+        "var": ["A", "B", "C", "x"],
+        "filter": [],
+        "split": ["nhận", "lấy", "của", "\\d+"]
+    },
+    "increase": {
+        "var": ["A", "B", "x"],
+        "filter": [],
+        "split": []
+    },
+    "decrease": {
+        "var": ["A", "B", "x"],
+        "filter": [],
+        "split": []
     }
 }
